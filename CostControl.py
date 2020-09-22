@@ -779,7 +779,7 @@ def load_usage_file(object_storage, object_file, max_file_id, cmd, tenancy, comp
 
                 num_rows += 1
 
-                url = 'https://qhs3h6j0buxd9es-p2p.adb.sa-saopaulo-1.oraclecloudapps.com/ords/usage/poccontrol/usage' + str(tenancy.name)
+                url = 'https://qhs3h6j0buxd9es-p2p.adb.sa-saopaulo-1.oraclecloudapps.com/ords/usage/poccontrol/usage/' + str(tenancy.name)
                 myobj = {
                     'a1': str(tenancy.name),
                     'a2': file_id,
