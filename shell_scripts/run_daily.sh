@@ -13,7 +13,7 @@
 # 0 0 * * * timeout 6h /home/opc/oci-python-sdk/examples/usage_reports_to_adw/shell_scripts/run_single_daily_usage2adw.sh > /home/opc/oci-python-sdk/examples/usage_reports_to_adw/shell_scripts/run_single_daily_usage2adw_crontab_run.txt 2>&1
 #############################################################################################################################
 # App dir
-export APPDIR=$HOME/CostControl
+export APPDIR=$HOME/CostControlV2
 export MIN_DATE=2020-01-01
 
 # Fixed variables
