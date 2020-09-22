@@ -7,7 +7,7 @@ sudo pip3 install oci oci-cli requests pandas
 
 git clone https://github.com/yusukeyurameshi/CostControlV2.git
 
-{ crontab -l -u opc; echo $CRON; } | crontab -u opc -
+{ crontab -l ; echo $CRON; } | crontab -
 
 /home/opc/CostControlV2/shell_scripts/run_daily.sh
 
