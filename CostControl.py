@@ -157,6 +157,13 @@ def identity_read_compartments(identity, tenancy):
 def set_parser_arguments():
     parser = argparse.ArgumentParser()
 
+    parser.add_argument('-c', type=argparse.FileType('r'), dest='config', help="Config File")
+    parser.add_argument('-t', default="", dest='profile', help='Config file section to use (tenancy profile)')
+    parser.add_argument('-f', default="", dest='fileid', help='File Id to load')
+    parser.add_argument('-d', default="", dest='filedate', help='Minimum File Date to load (i.e. yyyy-mm-dd)')
+    parser.add_argument('-p', default="", dest='proxy', help='Set Proxy (i.e. www-proxy-server.com:80) ')
+    parser.add_argument('-su', action='store_true', default=False, dest='skip_usage', help='Skip Load Usage Files')
+    parser.add_argument('-sc', action='store_true', default=False, dest='skip_cost', help='Skip Load Cost Files')
     parser.add_argument('-ip', action='store_true', default=False, dest='instance_principals', help='Use Instance Principals for Authentication')
     parser.add_argument('--version', action='version', version='%(prog)s ' + version)
 
