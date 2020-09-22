@@ -801,9 +801,6 @@ def load_usage_file(object_storage, object_file, max_file_id, cmd, tenancy, comp
                     'a18': tags_data
                 }
 
-                print(url)
-                print(myobj)
-
                 x = requests.post(url, data = myobj)
 
             print("   Completed  file " + o.name + " - " + str(num_rows) + " Rows Inserted")
