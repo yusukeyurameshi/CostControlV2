@@ -909,10 +909,10 @@ def main_process():
         #sql = "select /*+ full(a) parallel(a,4) */ nvl(max(file_id),'0') as file_id from OCI_USAGE a where TENANT_NAME=:tenant_name"
         #cursor.execute(sql, {"tenant_name": str(tenancy.name)})
         #max_usage_file_id, = cursor.fetchone()
-        #x = requests.get('https://qhs3h6j0buxd9es-p2p.adb.sa-saopaulo-1.oraclecloudapps.com/ords/usage/poccontrol/usage/' + str(tenancy.name))
-        #response = json.loads(x.text)
-        #print(response['file_id'])
-        #max_usage_file_id = response['file_id']
+        x = requests.get('https://qhs3h6j0buxd9es-p2p.adb.sa-saopaulo-1.oraclecloudapps.com/ords/usage/poccontrol/usage/' + str(tenancy.name))
+        response = json.loads(x.text)
+        print(response['file_id'])
+        max_usage_file_id = response['file_id']
 
         x = requests.get('https://qhs3h6j0buxd9es-p2p.adb.sa-saopaulo-1.oraclecloudapps.com/ords/usage/poccontrol/cost/' + str(tenancy.name))
         response = json.loads(x.text)
