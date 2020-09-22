@@ -934,7 +934,6 @@ def main_process():
     ############################################
     max_usage_file_id = ""
     max_cost_file_id = ""
-    connection = None
     try:
 
         ###############################
@@ -945,7 +944,7 @@ def main_process():
         #sql = "select /*+ full(a) parallel(a,4) */ nvl(max(file_id),'0') as file_id from OCI_USAGE a where TENANT_NAME=:tenant_name"
         #cursor.execute(sql, {"tenant_name": str(tenancy.name)})
         #max_usage_file_id, = cursor.fetchone()
-        max_usage_file_id, = 0
+        max_usage_file_id = "0"
 
         x = requests.get('https://qhs3h6j0buxd9es-p2p.adb.sa-saopaulo-1.oraclecloudapps.com/ords/usage/poccontrol/cost/' + str(tenancy.name))
         response = json.loads(x.text)
