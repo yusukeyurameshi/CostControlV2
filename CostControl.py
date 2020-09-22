@@ -454,7 +454,7 @@ def update_usage_stats(connection):
 #########################################################################
 # Load Cost File
 ##########################################################################
-def load_cost_file(connection, object_storage, object_file, max_file_id, cmd, tenancy, compartments):
+def load_cost_file(object_storage, object_file, max_file_id, cmd, tenancy, compartments):
     num_files = 0
     num_rows = 0
 
@@ -689,10 +689,6 @@ def load_cost_file(connection, object_storage, object_file, max_file_id, cmd, te
             x = requests.post(url, data = myobj)
 
         return num_files
-
-    except cx_Oracle.DatabaseError as e:
-        print("\nload_cost_file() - Error manipulating database - " + str(e) + "\n")
-        raise SystemExit
 
     except Exception as e:
         print("\nload_cost_file() - Error Download Usage and insert to database 01 - " + str(e))
@@ -940,33 +936,16 @@ def main_process():
     max_cost_file_id = ""
     connection = None
     try:
-        print("\nConnecting to database " + cmd.dname)
-        connection = cx_Oracle.connect(user=cmd.duser, password=cmd.dpass, dsn=cmd.dname, encoding="UTF-8", nencoding="UTF-8")
-        cursor = connection.cursor()
-        print("   Connected")
-
-        # Check tables structure
-        #print("\nChecking Database Structure...")
-        #check_database_table_structure_usage(connection)
-        #check_database_table_structure_cost(connection)
-        #check_database_table_structure_price_list(connection, tenancy.name)
-
-        ###############################
-        # enable hints
-        ###############################
-        sql = "ALTER SESSION SET OPTIMIZER_IGNORE_HINTS=FALSE"
-        cursor.execute(sql)
-        sql = "ALTER SESSION SET OPTIMIZER_IGNORE_PARALLEL_HINTS=FALSE"
-        cursor.execute(sql)
 
         ###############################
         # fetch max file id processed
         # for usage and cost
         ###############################
-        print("\nChecking Last Loaded File...")
-        sql = "select /*+ full(a) parallel(a,4) */ nvl(max(file_id),'0') as file_id from OCI_USAGE a where TENANT_NAME=:tenant_name"
-        cursor.execute(sql, {"tenant_name": str(tenancy.name)})
-        max_usage_file_id, = cursor.fetchone()
+        #print("\nChecking Last Loaded File...")
+        #sql = "select /*+ full(a) parallel(a,4) */ nvl(max(file_id),'0') as file_id from OCI_USAGE a where TENANT_NAME=:tenant_name"
+        #cursor.execute(sql, {"tenant_name": str(tenancy.name)})
+        #max_usage_file_id, = cursor.fetchone()
+        max_usage_file_id, = 0
 
         x = requests.get('https://qhs3h6j0buxd9es-p2p.adb.sa-saopaulo-1.oraclecloudapps.com/ords/usage/poccontrol/cost/' + str(tenancy.name))
         response = json.loads(x.text)
@@ -975,11 +954,6 @@ def main_process():
 
         print("   Max Usage File Id Processed = " + str(max_usage_file_id))
         print("   Max Cost  File Id Processed = " + str(max_cost_file_id))
-        cursor.close()
-
-    except cx_Oracle.DatabaseError as e:
-        print("\nError manipulating database - " + str(e) + "\n")
-        raise SystemExit
 
     except Exception as e:
         raise Exception("\nError manipulating database - " + str(e))
@@ -1014,7 +988,7 @@ def main_process():
             print("\nHandling Cost Report...")
             objects = object_storage.list_objects(usage_report_namespace, str(tenancy.id), fields="timeCreated,size", limit=999, prefix="reports/cost-csv/", start="reports/cost-csv/" + max_cost_file_id).data
             for object_file in objects.objects:
-                cost_num += load_cost_file(connection, object_storage, object_file, max_cost_file_id, cmd, tenancy, compartments)
+                cost_num += load_cost_file(object_storage, object_file, max_cost_file_id, cmd, tenancy, compartments)
             print("\n   Total " + str(cost_num) + " Cost Files Loaded")
 
         # Handle Index structure if not exist
@@ -1029,12 +1003,6 @@ def main_process():
         #    update_cost_reference(connection)
         #    update_price_list(connection)
         #    update_public_rates(connection, tenancy.name)
-
-        # Close Connection
-        connection.close()
-
-    except cx_Oracle.DatabaseError as e:
-        print("\nError manipulating database - " + str(e) + "\n")
 
     except Exception as e:
         print("\nError Download Usage and insert to database 03 - " + str(e))
