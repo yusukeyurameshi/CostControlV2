@@ -820,20 +820,6 @@ def load_usage_file(object_storage, object_file, max_file_id, cmd, tenancy, comp
             myobj = {'tag': tag}
             x = requests.post(url, data = myobj)
 
-
-
-        #if data:
-        #    cursor = cx_Oracle.Cursor(connection)
-        #    sql = "INSERT INTO OCI_USAGE_TAG_KEYS (TENANT_NAME , TAG_KEY) "
-        #    sql += "SELECT :1, :2 FROM DUAL "
-        #    sql += "WHERE NOT EXISTS (SELECT 1 FROM OCI_USAGE_TAG_KEYS B WHERE B.TENANT_NAME = :3 AND B.TAG_KEY = :4)"
-
-        #    cursor.prepare(sql)
-        #    cursor.executemany(None, data)
-        #    connection.commit()
-        #    cursor.close()
-        #    print("   Total " + str(len(data)) + " Tags Merged.")
-
         return num_files
 
     except Exception as e:
