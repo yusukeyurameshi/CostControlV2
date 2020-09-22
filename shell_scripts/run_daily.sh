@@ -22,6 +22,9 @@ export REPORT_DIR=${APPDIR}/report
 mkdir -p ${REPORT_DIR}
 export OUTPUT_FILE=${REPORT_DIR}/${DATE}.txt
 
+cd $APPDIR
+git pull
+
 # execute using instance principles
 echo "Running ... to $OUTPUT_FILE "
 
