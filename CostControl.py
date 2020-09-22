@@ -527,9 +527,6 @@ def load_cost_file(object_storage, object_file, max_file_id, cmd, tenancy, compa
             batch_size = 5000
             array_size = 1000
 
-            # Predefine the memory areas to match the table definition
-            cursor.setinputsizes(None, array_size)
-
             data = []
             for row in csv_reader:
 
