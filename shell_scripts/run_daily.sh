@@ -25,7 +25,7 @@ export OUTPUT_FILE=${REPORT_DIR}/${DATE}.txt
 # execute using instance principles
 echo "Running ... to $OUTPUT_FILE "
 
-python3 $APPDIR/CostControl.py -ip -d $MIN_DATE > $OUTPUT_FILE
+python3 $APPDIR/CostControl.py -ip > $OUTPUT_FILE
 
 grep -i "Error" $OUTPUT_FILE
 echo "Finished at `date`  "
