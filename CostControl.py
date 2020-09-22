@@ -689,7 +689,7 @@ def load_cost_file(object_storage, object_file, max_file_id, cmd, tenancy, compa
 #########################################################################
 # Load Usage File
 ##########################################################################
-def load_usage_file(connection, object_storage, object_file, max_file_id, cmd, tenancy, compartments):
+def load_usage_file(object_storage, object_file, max_file_id, cmd, tenancy, compartments):
     num_files = 0
     num_rows = 0
     try:
@@ -731,25 +731,9 @@ def load_usage_file(connection, object_storage, object_file, max_file_id, cmd, t
         with gzip.open(path_filename, 'rt') as file_in:
             csv_reader = csv.DictReader(file_in)
 
-            # sql statement
-            sql = "INSERT INTO OCI_USAGE (TENANT_NAME , FILE_ID, USAGE_INTERVAL_START, USAGE_INTERVAL_END, PRD_SERVICE, PRD_RESOURCE, "
-            sql += "PRD_COMPARTMENT_ID, PRD_COMPARTMENT_NAME, PRD_COMPARTMENT_PATH, PRD_REGION, PRD_AVAILABILITY_DOMAIN, USG_RESOURCE_ID, "
-            sql += "USG_BILLED_QUANTITY, USG_CONSUMED_QUANTITY, USG_CONSUMED_UNITS, USG_CONSUMED_MEASURE, IS_CORRECTION, TAGS_DATA "
-            sql += ") VALUES ("
-            sql += ":1, :2, to_date(:3,'YYYY-MM-DD HH24:MI'), to_date(:4,'YYYY-MM-DD HH24:MI'), :5, :6, "
-            sql += ":7, :8, :9, :10, :11, :12, "
-            sql += "to_number(:13), to_number(:14), :15, :16, :17 ,:18 "
-            sql += ") "
-
             # Adjust the batch size to meet memory and performance requirements
             batch_size = 5000
             array_size = 1000
-
-            # insert bulk to database
-            cursor = cx_Oracle.Cursor(connection)
-
-            # Predefine the memory areas to match the table definition
-            cursor.setinputsizes(None, array_size)
 
             data = []
             for row in csv_reader:
@@ -793,42 +777,32 @@ def load_usage_file(connection, object_storage, object_file, max_file_id, cmd, t
                 usage_consumedQuantityMeasure = get_column_value_from_array('usage/consumedQuantityMeasure', row)
                 lineItem_isCorrection = get_column_value_from_array('lineItem/isCorrection', row)
 
-                # create array for bulk insert
-                row_data = (
-                    str(tenancy.name),
-                    file_id,
-                    lineItem_intervalUsageStart[0:10] + " " + lineItem_intervalUsageStart[11:16],
-                    lineItem_intervalUsageEnd[0:10] + " " + lineItem_intervalUsageEnd[11:16],
-                    product_service,
-                    product_resource,
-                    product_compartmentId,
-                    product_compartmentName,
-                    compartment_path,
-                    product_region,
-                    product_availabilityDomain,
-                    product_resourceId,
-                    usage_billedQuantity,
-                    usage_consumedQuantity,
-                    usage_consumedQuantityUnits,
-                    usage_consumedQuantityMeasure,
-                    lineItem_isCorrection,
-                    tags_data
-                )
-                data.append(row_data)
                 num_rows += 1
 
-                # insert every buffer size
-                if len(data) % batch_size == 0:
-                    cursor.executemany(sql, data)
-                    data = []
+                url = 'https://qhs3h6j0buxd9es-p2p.adb.sa-saopaulo-1.oraclecloudapps.com/ords/usage/poccontrol/usage' + str(tenancy.name)
+                myobj = {
+                    'a1': str(tenancy.name),
+                    'a2': file_id,
+                    'a3': lineItem_intervalUsageStart[0:10] + " " + lineItem_intervalUsageStart[11:16],
+                    'a4': lineItem_intervalUsageEnd[0:10] + " " + lineItem_intervalUsageEnd[11:16],
+                    'a5': product_service,
+                    'a6': product_resource,
+                    'a7': product_compartmentId,
+                    'a8': product_compartmentName,
+                    'a9': compartment_path,
+                    'a10': product_region,
+                    'a11': product_availabilityDomain,
+                    'a12': product_resourceId,
+                    'a13': usage_billedQuantity,
+                    'a14': usage_consumedQuantity,
+                    'a15': usage_consumedQuantityUnits,
+                    'a16': usage_consumedQuantityMeasure,
+                    'a17': lineItem_isCorrection,
+                    'a18': tags_data
+                }
 
-            # final insert
-            if data:
-                cursor.executemany(sql, data)
+                x = requests.post(url, data = myobj)
 
-            # commit
-            connection.commit()
-            cursor.close()
             print("   Completed  file " + o.name + " - " + str(num_rows) + " Rows Inserted")
 
         num_files += 1
@@ -842,25 +816,25 @@ def load_usage_file(connection, object_storage, object_file, max_file_id, cmd, t
         data = []
         for tag in tags_keys:
             row_data = (str(tenancy.name), tag, str(tenancy.name), tag)
-            data.append(row_data)
+            url = 'https://qhs3h6j0buxd9es-p2p.adb.sa-saopaulo-1.oraclecloudapps.com/ords/usage/poccontrol/usagetags/' + str(tenancy.name)
+            myobj = {'tag': tag}
+            x = requests.post(url, data = myobj)
 
-        if data:
-            cursor = cx_Oracle.Cursor(connection)
-            sql = "INSERT INTO OCI_USAGE_TAG_KEYS (TENANT_NAME , TAG_KEY) "
-            sql += "SELECT :1, :2 FROM DUAL "
-            sql += "WHERE NOT EXISTS (SELECT 1 FROM OCI_USAGE_TAG_KEYS B WHERE B.TENANT_NAME = :3 AND B.TAG_KEY = :4)"
 
-            cursor.prepare(sql)
-            cursor.executemany(None, data)
-            connection.commit()
-            cursor.close()
-            print("   Total " + str(len(data)) + " Tags Merged.")
+
+        #if data:
+        #    cursor = cx_Oracle.Cursor(connection)
+        #    sql = "INSERT INTO OCI_USAGE_TAG_KEYS (TENANT_NAME , TAG_KEY) "
+        #    sql += "SELECT :1, :2 FROM DUAL "
+        #    sql += "WHERE NOT EXISTS (SELECT 1 FROM OCI_USAGE_TAG_KEYS B WHERE B.TENANT_NAME = :3 AND B.TAG_KEY = :4)"
+
+        #    cursor.prepare(sql)
+        #    cursor.executemany(None, data)
+        #    connection.commit()
+        #    cursor.close()
+        #    print("   Total " + str(len(data)) + " Tags Merged.")
 
         return num_files
-
-    except cx_Oracle.DatabaseError as e:
-        print("\nload_usage_file() - Error manipulating database - " + str(e) + "\n")
-        raise SystemExit
 
     except Exception as e:
         print("\nload_usage_file() - Error Download Usage and insert to database 02 - " + str(e))
@@ -935,7 +909,10 @@ def main_process():
         #sql = "select /*+ full(a) parallel(a,4) */ nvl(max(file_id),'0') as file_id from OCI_USAGE a where TENANT_NAME=:tenant_name"
         #cursor.execute(sql, {"tenant_name": str(tenancy.name)})
         #max_usage_file_id, = cursor.fetchone()
-        max_usage_file_id = "0"
+        x = requests.get('https://qhs3h6j0buxd9es-p2p.adb.sa-saopaulo-1.oraclecloudapps.com/ords/usage/poccontrol/usage/' + str(tenancy.name))
+        response = json.loads(x.text)
+        print(response['file_id'])
+        max_usage_file_id = response['file_id']
 
         x = requests.get('https://qhs3h6j0buxd9es-p2p.adb.sa-saopaulo-1.oraclecloudapps.com/ords/usage/poccontrol/cost/' + str(tenancy.name))
         response = json.loads(x.text)
@@ -962,13 +939,13 @@ def main_process():
         #############################
         # Handle Report Usage
         #############################
-        #usage_num = 0
-        #if not cmd.skip_usage:
-        #    print("\nHandling Usage Report...")
-        #    objects = object_storage.list_objects(usage_report_namespace, str(tenancy.id), fields="timeCreated,size", limit=999, prefix="reports/usage-csv/", start="reports/usage-csv/" + max_usage_file_id).data
-        #    for object_file in objects.objects:
-        #        usage_num += load_usage_file(connection, object_storage, object_file, max_usage_file_id, cmd, tenancy, compartments)
-        #    print("\n   Total " + str(usage_num) + " Usage Files Loaded")
+        usage_num = 0
+        if not cmd.skip_usage:
+            print("\nHandling Usage Report...")
+            objects = object_storage.list_objects(usage_report_namespace, str(tenancy.id), fields="timeCreated,size", limit=999, prefix="reports/usage-csv/", start="reports/usage-csv/" + max_usage_file_id).data
+            for object_file in objects.objects:
+                usage_num += load_usage_file(object_storage, object_file, max_usage_file_id, cmd, tenancy, compartments)
+            print("\n   Total " + str(usage_num) + " Usage Files Loaded")
 
         #############################
         # Handle Cost Usage
