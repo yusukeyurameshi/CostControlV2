@@ -493,12 +493,6 @@ def load_cost_file(object_storage, object_file, max_file_id, cmd, tenancy, compa
             for chunk in object_details.data.raw.stream(1024 * 1024, decode_content=False):
                 f.write(chunk)
 
-        # incluir código de upload
-        config2 = oci.config.from_file(file_location="~/CostControl/config.oci")
-        object_storage2 = oci.object_storage.ObjectStorageClient(config2)
-        with open(path_filename, 'rb') as f:
-            obj = object_storage2.put_object("oraclemetodista", "POC_NAO_APAGAR", str(tenancy.name) + "-" + filename, f)
-
         # Read file to variable
         with gzip.open(path_filename, 'rt') as file_in:
             csv_reader = csv.DictReader(file_in)
