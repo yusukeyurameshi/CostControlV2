@@ -96,7 +96,7 @@ def create_signer(cmd):
 def identity_read_compartments(identity, tenancy):
 
     compartments = []
-    print("Loading Compartments...")
+    #print("Loading Compartments...")
 
     try:
         # read all compartments to variable
@@ -142,7 +142,7 @@ def identity_read_compartments(identity, tenancy):
 
         # sort the compartment
         sorted_compartments = sorted(compartments, key=lambda k: k['path'])
-        print("    Total " + str(len(sorted_compartments)) + " compartments loaded.")
+        #print("    Total " + str(len(sorted_compartments)) + " compartments loaded.")
         return sorted_compartments
 
     except oci.exceptions.RequestException:
@@ -179,7 +179,7 @@ def update_cost_stats(connection):
         # open cursor
         cursor = connection.cursor()
 
-        print("\nMerging statistics into OCI_COST_STATS...")
+        #print("\nMerging statistics into OCI_COST_STATS...")
 
         # run merge to oci_update_stats
         sql = "merge into OCI_COST_STATS a "
@@ -209,7 +209,7 @@ def update_cost_stats(connection):
 
         cursor.execute(sql, {"version": version})
         connection.commit()
-        print("   Merge Completed, " + str(cursor.rowcount) + " rows merged")
+        #print("   Merge Completed, " + str(cursor.rowcount) + " rows merged")
         cursor.close()
 
     except cx_Oracle.DatabaseError as e:
@@ -228,7 +228,7 @@ def update_price_list(connection):
         # open cursor
         cursor = connection.cursor()
 
-        print("\nMerging statistics into OCI_PRICE_LIST...")
+        #print("\nMerging statistics into OCI_PRICE_LIST...")
 
         # run merge to oci_update_stats
         sql = "MERGE INTO OCI_PRICE_LIST A "
@@ -261,7 +261,7 @@ def update_price_list(connection):
 
         cursor.execute(sql)
         connection.commit()
-        print("   Merge Completed, " + str(cursor.rowcount) + " rows merged")
+        #print("   Merge Completed, " + str(cursor.rowcount) + " rows merged")
         cursor.close()
 
     except cx_Oracle.DatabaseError as e:
@@ -280,7 +280,7 @@ def update_cost_reference(connection):
         # open cursor
         cursor = connection.cursor()
 
-        print("\nMerging statistics into OCI_COST_REFERENCE...")
+        #print("\nMerging statistics into OCI_COST_REFERENCE...")
 
         # run merge to oci_update_stats
         sql = "merge into OCI_COST_REFERENCE a "
@@ -312,7 +312,7 @@ def update_cost_reference(connection):
 
         cursor.execute(sql)
         connection.commit()
-        print("   Merge Completed, " + str(cursor.rowcount) + " rows merged")
+        #print("   Merge Completed, " + str(cursor.rowcount) + " rows merged")
         cursor.close()
 
     except cx_Oracle.DatabaseError as e:
@@ -333,7 +333,7 @@ def update_public_rates(connection, tenant_name):
         cursor = connection.cursor()
         api_url = "https://itra.oraclecloud.com/itas/.anon/myservices/api/v1/products?partNumber="
 
-        print("\nMerging Public Rates into OCI_RATE_CARD...")
+        #print("\nMerging Public Rates into OCI_RATE_CARD...")
 
         # retrieve the SKUS to query
         sql = "select COST_PRODUCT_SKU, COST_CURRENCY_CODE from OCI_PRICE_LIST where tenant_name=:tenant_name"
@@ -393,7 +393,7 @@ def update_public_rates(connection, tenant_name):
             # Commit
             connection.commit()
 
-        print("   Update Completed, " + str(num_rows) + " rows updated.")
+        #print("   Update Completed, " + str(num_rows) + " rows updated.")
         cursor.close()
 
     except cx_Oracle.DatabaseError as e:
@@ -415,7 +415,7 @@ def update_usage_stats(connection):
         # open cursor
         cursor = connection.cursor()
 
-        print("\nMerging statistics into OCI_USAGE_STATS...")
+        #print("\nMerging statistics into OCI_USAGE_STATS...")
 
         # run merge to oci_update_stats
         sql = "merge into OCI_USAGE_STATS a "
@@ -441,7 +441,7 @@ def update_usage_stats(connection):
 
         cursor.execute(sql, {"version": version})
         connection.commit()
-        print("   Merge Completed, " + str(cursor.rowcount) + " rows merged")
+        #print("   Merge Completed, " + str(cursor.rowcount) + " rows merged")
         cursor.close()
 
     except cx_Oracle.DatabaseError as e:
@@ -485,7 +485,7 @@ def load_cost_file(object_storage, object_file, max_file_id, cmd, tenancy, compa
                 return num_files
 
         path_filename = work_report_dir + '/' + filename
-        print("   Processing file " + o.name + " - " + str(o.size) + " bytes, " + file_time)
+        #print("   Processing file " + o.name + " - " + str(o.size) + " bytes, " + file_time)
 
         # download file
         object_details = object_storage.get_object(usage_report_namespace, str(tenancy.id), o.name)
@@ -657,7 +657,7 @@ def load_cost_file(object_storage, object_file, max_file_id, cmd, tenancy, compa
 
                 x = requests.post(url, data = myobj)
 
-            print("   Completed  file " + o.name + " - " + str(num_rows) + " Rows Inserted")
+            #print("   Completed  file " + o.name + " - " + str(num_rows) + " Rows Inserted")
 
         num_files += 1
 
@@ -719,7 +719,7 @@ def load_usage_file(object_storage, object_file, max_file_id, cmd, tenancy, comp
                 return num_files
 
         path_filename = work_report_dir + '/' + filename
-        print("   Processing file " + o.name + " - " + str(o.size) + " bytes, " + file_time)
+        #print("   Processing file " + o.name + " - " + str(o.size) + " bytes, " + file_time)
 
         # download file
         object_details = object_storage.get_object(usage_report_namespace, str(tenancy.id), o.name)
@@ -803,7 +803,7 @@ def load_usage_file(object_storage, object_file, max_file_id, cmd, tenancy, comp
 
                 x = requests.post(url, data = myobj)
 
-            print("   Completed  file " + o.name + " - " + str(num_rows) + " Rows Inserted")
+            #print("   Completed  file " + o.name + " - " + str(num_rows) + " Rows Inserted")
 
         num_files += 1
 
@@ -839,9 +839,9 @@ def main_process():
     ############################################
     # Start
     ############################################
-    print_header("Running Usage Load to ADW", 0)
-    print("Starts at " + str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-    print("Command Line : " + ' '.join(x for x in sys.argv[1:]))
+    #print_header("Running Usage Load to ADW", 0)
+    #print("Starts at " + str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+    #print("Command Line : " + ' '.join(x for x in sys.argv[1:]))
 
     ############################################
     # Identity extract compartments
@@ -849,7 +849,7 @@ def main_process():
     compartments = []
     tenancy = None
     try:
-        print("\nConnecting to Identity Service...")
+        #print("\nConnecting to Identity Service...")
         identity = oci.identity.IdentityClient(config, signer=signer)
         if cmd.proxy:
             identity.base_client.session.proxies = {'https': cmd.proxy}
@@ -863,11 +863,11 @@ def main_process():
             if reg.is_home_region:
                 tenancy_home_region = str(reg.region_name)
 
-        print("   Tenant Name : " + str(tenancy.name))
-        print("   Tenant Id   : " + tenancy.id)
-        print("   App Version : " + version)
-        print("   Home Region : " + tenancy_home_region)
-        print("")
+        #print("   Tenant Name : " + str(tenancy.name))
+        #print("   Tenant Id   : " + tenancy.id)
+        #print("   App Version : " + version)
+        #print("   Home Region : " + tenancy_home_region)
+        #print("")
 
         # set signer home region
         signer.region = tenancy_home_region
@@ -897,16 +897,16 @@ def main_process():
         #max_usage_file_id, = cursor.fetchone()
         x = requests.get('https://qhs3h6j0buxd9es-p2p.adb.sa-saopaulo-1.oraclecloudapps.com/ords/usage/poccontrol/usage/' + str(tenancy.name))
         response = json.loads(x.text)
-        print(response['file_id'])
+        #print(response['file_id'])
         max_usage_file_id = response['file_id']
 
         x = requests.get('https://qhs3h6j0buxd9es-p2p.adb.sa-saopaulo-1.oraclecloudapps.com/ords/usage/poccontrol/cost/' + str(tenancy.name))
         response = json.loads(x.text)
-        print(response['file_id'])
+        #print(response['file_id'])
         max_cost_file_id = response['file_id']
 
-        print("   Max Usage File Id Processed = " + str(max_usage_file_id))
-        print("   Max Cost  File Id Processed = " + str(max_cost_file_id))
+        #print("   Max Usage File Id Processed = " + str(max_usage_file_id))
+        #print("   Max Cost  File Id Processed = " + str(max_cost_file_id))
 
     except Exception as e:
         raise Exception("\nError manipulating database - " + str(e))
@@ -915,34 +915,34 @@ def main_process():
     # Download Usage, cost and insert to database
     ############################################
     try:
-        print("\nConnecting to Object Storage Service...")
+        #print("\nConnecting to Object Storage Service...")
 
         object_storage = oci.object_storage.ObjectStorageClient(config, signer=signer)
         if cmd.proxy:
             object_storage.base_client.session.proxies = {'https': cmd.proxy}
-        print("   Connected")
+        #print("   Connected")
 
         #############################
         # Handle Report Usage
         #############################
         usage_num = 0
         if not cmd.skip_usage:
-            print("\nHandling Usage Report...")
+            #print("\nHandling Usage Report...")
             objects = object_storage.list_objects(usage_report_namespace, str(tenancy.id), fields="timeCreated,size", limit=999, prefix="reports/usage-csv/", start="reports/usage-csv/" + max_usage_file_id).data
             for object_file in objects.objects:
                 usage_num += load_usage_file(object_storage, object_file, max_usage_file_id, cmd, tenancy, compartments)
-            print("\n   Total " + str(usage_num) + " Usage Files Loaded")
+            #print("\n   Total " + str(usage_num) + " Usage Files Loaded")
 
         #############################
         # Handle Cost Usage
         #############################
         cost_num = 0
         if not cmd.skip_cost:
-            print("\nHandling Cost Report...")
+            #print("\nHandling Cost Report...")
             objects = object_storage.list_objects(usage_report_namespace, str(tenancy.id), fields="timeCreated,size", limit=999, prefix="reports/cost-csv/", start="reports/cost-csv/" + max_cost_file_id).data
             for object_file in objects.objects:
                 cost_num += load_cost_file(object_storage, object_file, max_cost_file_id, cmd, tenancy, compartments)
-            print("\n   Total " + str(cost_num) + " Cost Files Loaded")
+            #print("\n   Total " + str(cost_num) + " Cost Files Loaded")
 
         # Handle Index structure if not exist
         #check_database_index_structure_usage(connection)
@@ -963,7 +963,7 @@ def main_process():
     ############################################
     # print completed
     ############################################
-    print("\nCompleted at " + str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+    #print("\nCompleted at " + str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
 
 
 ##########################################################################
