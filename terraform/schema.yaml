@@ -1,0 +1,54 @@
+title: "Oracle Cost Control Terraform"
+description: "A terraform script to deploy Cost Control using Resource Manager and Freetier resources"
+schemaVersion: 1.0.0
+version: "20200923"
+locale: "en"
+
+groupings:
+  - title: "General Configuration"
+    visible: false
+    variables:
+      - region
+      - compartment_ocid
+      - Instance_shape_free
+
+  - title: "Optional Configuration"
+    visible: true
+    variables:
+      - InstanceOS
+      - InstanceOSVersion
+
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    # type: string
+    required: true
+    title: "Compartment"
+    description: "Root Compartment"
+
+  Instance_shape_free:
+    type: string
+    required: false
+    title: "Instance Shape Free"
+
+  InstanceOS:
+    type: string
+    required: false
+    title: "Instance OS"
+
+  InstanceOSVersion:
+    type: string
+    required: false
+    title: "Instance OS Version"
+
+outputGroups:
+  - title: "Cost Control App details"
+    outputs:
+      - ${dev}
+
+outputs:
+  dev:
+    type: string
+    title: "Message"
+    displayText: "Made with \u2764 by Fabio Silva"
+    visible: true
