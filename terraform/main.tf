@@ -26,12 +26,10 @@ resource oci_identity_policy PolCostControl {
 }
 
 resource oci_core_vcn virtual_network {
-  cidr_block     = "10.0.0.0/16"
+  cidr_block     = var.cidr_block
   compartment_id = oci_identity_compartment.CostControl.id
-  defined_tags   = {}
-
-  display_name = "costcontrol_vcn"
-  dns_label    = "costcontrol"
+  display_name = var.display_name
+  dns_label    = var.dns_label
 }
 
 data "oci_identity_availability_domains" "availability_domains" {

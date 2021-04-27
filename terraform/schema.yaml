@@ -11,6 +11,9 @@ groupings:
       - region
       - compartment_ocid
       - Instance_shape_free
+      - cidr_block
+      - display_name
+      - dns_label
 
   - title: "Optional Configuration"
     visible: true
