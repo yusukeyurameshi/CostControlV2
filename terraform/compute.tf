@@ -5,7 +5,7 @@ resource "oci_core_instance" "CostControl-inst" {
   shape               = var.Instance_shape_free
 
   source_details {
-    source_id   = lookup(data.oci_core_images.OLImageOCID.images[0], "id")
+    source_id   = "ocid1.image.oc1.sa-saopaulo-1.aaaaaaaawriprcro7btwljype2ygx3npm2ardkzx4jj6mvifa2t6znu4uvfq"
     source_type = "image"
   }
 
