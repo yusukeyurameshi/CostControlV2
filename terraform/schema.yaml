@@ -56,5 +56,5 @@ outputs:
   dev:
     type: string
     title: "Message"
-    displayText: "Made with \u2764 by Fabio Silva"
+    displayText: "Made with \u2764 by Fabio Silva & Igor Nicoli"
     visible: true
