@@ -1,29 +1,19 @@
 terraform {
-  required_version = ">= 0.14"
+  required_providers {
+    oci = {
+      version = ">= 4.0.0"
+    }
+  }
+}
+
+locals {region_map = {for r in data.oci_identity_regions.regions.regions : r.key => r.name}}
+provider "oci" {
+  alias        = "home_region"
+  region       = lookup(local.region_map, data.oci_identity_tenancy.tenancy.home_region_key)
+  tenancy_ocid = var.tenancy_ocid
 }
 
 provider "oci" {
-  alias                = "homeregion"
-#  tenancy_ocid         = var.tenancy_ocid
-#  user_ocid            = var.user_ocid
-#  fingerprint          = var.fingerprint
-#  private_key_path     = var.private_key_path
-  region               = data.oci_identity_region_subscriptions.home_region_subscriptions.region_subscriptions[0].region_name
-  disable_auto_retries = "true"
+  region       = var.region
+  tenancy_ocid = var.tenancy_ocid
 }
-
-
-# Required by the OCI Provider
-variable compartment_ocid {}
-variable region {}
-
-# ---------------------------------------------------------------------------------------------------------------------
-# Optional variables
-# The defaults here will give you a cluster.  You can also modify these.
-# ---------------------------------------------------------------------------------------------------------------------
-variable Instance_shape_free {default = "VM.Standard.E2.1.Micro"}
-variable InstanceOS {default = "Oracle Linux"}
-variable InstanceOSVersion {default = "7.9"}
-variable cidr_block {default = "10.0.0.0/16"}
-variable display_name {default = "costcontrol_vcn"}
-variable dns_label {default = "costcontrol"}

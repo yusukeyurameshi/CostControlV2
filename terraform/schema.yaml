@@ -9,25 +9,28 @@ groupings:
     visible: false
     variables:
       - region
-      - compartment_ocid
+      - tenancy_ocid
       - Instance_shape_free
       - cidr_block
       - display_name
       - dns_label
 
   - title: "Optional Configuration"
-    visible: true
+    visible: false
     variables:
       - InstanceOS
       - InstanceOSVersion
 
 variables:
-  compartment_ocid:
-    type: oci:identity:compartment:id
-    # type: string
-    required: true
-    title: "Compartment"
-    description: "Root Compartment"
+  region:
+    type: string
+    required: false
+    title: "Region name"
+
+  tenancy_ocid:
+    type: string
+    required: false
+    title: "Tenancy Oracle Cloud ID"
 
   Instance_shape_free:
     type: string
